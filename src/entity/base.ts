@@ -1,5 +1,5 @@
 import { ObjectID, WithoutProjection, FindOneOptions, Collection } from 'mongodb';
-import { classToPlain, plainToClass, Type } from 'class-transformer';
+import { classToPlain, plainToClass, plainToClassFromExist, Type } from 'class-transformer';
 import { DatabaseManager } from '../manager';
 import { Filter } from '../typings/query';
 
@@ -32,6 +32,14 @@ export class BaseEntity {
    * Sort by field in ASC or DESC
    */
   private static _sort?: { [K in keyof Partial<any>]: -1 | 1 }
+
+  /**
+   *
+   * @param { object } data
+   */
+  constructor(data?: Record<string, unknown>) {
+    Object.assign(this, data)
+  }
 
   /**
    * Get repository from collection
@@ -136,7 +144,7 @@ export class BaseEntity {
       result = await this.repository.findOne(filter);
     }
 
-    return plainToClass(this, result);
+    return plainToClassFromExist(new this, result);
   }
 
   /**

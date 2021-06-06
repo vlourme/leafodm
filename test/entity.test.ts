@@ -16,6 +16,19 @@ afterAll(async () => {
 })
 
 describe('Entity', () => {
+  test('should create object with already existing data', () => {
+    const data = {
+      name: 'John Doe',
+      email: 'john.doe@example.org'
+    }
+
+    const user = new User(data)
+
+    expect(user.name).toBe('John Doe')
+    expect(user.email).toBe('john.doe@example.org')
+    expect(user.password).toBeUndefined()
+  })
+
   test('should create an object', async () => {
     const user = new User()
     user.name = 'John Doe'
@@ -85,6 +98,7 @@ describe('Entity', () => {
 
     expect(user).toBeTruthy()
     expect(user?.name).toBe('John Doe')
+    expect(user).toBeInstanceOf(User)
   })
 
   test('should update one object', async () => {
