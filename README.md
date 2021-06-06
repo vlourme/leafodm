@@ -112,6 +112,32 @@ const users = await User.take(5).find() // Will only return 5 documents
 const users = await User.skip(5).find() // Will skip 5 first documents
 ```
 
+## Usage tips
+This library is very useful when combined with [`class-transformer`](https://github.com/typestack/class-transformer/) and [`class-validator`](https://github.com/typestack/class-validator),
+no need to instance your model and write date to every fields.
+Here is an example with the web framework [FoalTS](http://foalts.org/):
+```ts
+@Post('/register')
+@ValidateBody(User)
+async createUser(ctx: Context) {
+  const user: User = ctx.request.body
+
+  const exists = User.findOne({
+    email: user.email
+  })
+
+  if (exists) {
+    throw new HttpResponseBadRequest('this email is already taken')
+  }
+
+  return new HttpResponseOK({
+    status: true,
+    message: 'account created',
+    data: await user.create(),
+  });
+}
+```
+
 ## Roadmap
 You can follow and track the work on [project](https://github.com/vlourme/leafodm/projects/1).
 
