@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": [
+      "es2017",
+      "es7",
+      "es6",
+      "dom"
+    ],
+    "declaration": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "rootDir": "src",
+  },
+  "include": [
+    "src/**/*.ts",
+  ],
+  "exclude": [
+    "dist",
+    "test",
+    "node_modules"
+  ]
+}
