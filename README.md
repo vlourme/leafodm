@@ -1,4 +1,7 @@
 # Leaf ODM
+[![npm](https://img.shields.io/npm/v/leafodm)](https://www.npmjs.com/package/leafodm)
+![npm type definitions](https://img.shields.io/npm/types/leafodm)
+
 Leaf ODM is an abstraction layer for MongoDB on NodeJS. It aims to provide a better class support for MongoDB while keeping it's schema-less feature.
 
 ## Philosophy
