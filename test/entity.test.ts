@@ -74,7 +74,8 @@ describe('Entity', () => {
 
   test('should get all object with DESC order', async () => {
     const users = await User.sortBy({
-      name: 'DESC'
+      name: 'DESC',
+    
     }).find()
 
     expect(users).toBeTruthy()

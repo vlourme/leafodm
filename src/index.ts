@@ -1,3 +1,3 @@
 export * from './entity';
-export * from './typings';
+export * from './types';
 export { DatabaseManager } from './manager';

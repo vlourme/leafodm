@@ -1,7 +1,7 @@
-import { ObjectID, WithoutProjection, FindOneOptions, Collection } from 'mongodb';
 import { classToPlain, plainToClass, plainToClassFromExist, Type } from 'class-transformer';
+import { Collection, FindOneOptions, ObjectID, WithoutProjection } from 'mongodb';
 import { DatabaseManager } from '../manager';
-import { Filter } from '../typings/query';
+import { Filter, PropertySorting } from '../types';
 
 /**
  * Base Entity
@@ -14,9 +14,9 @@ export class BaseEntity {
   _id: string;
 
   /**
-   * Force schema-less structure
+   * Allow schema-less
    */
-  [key: string]: any;
+  [key: string]: unknown
 
   /**
    * Take an amount of document
@@ -92,7 +92,7 @@ export class BaseEntity {
    *
    * @return { this }
    */
-  public static sortBy<T extends typeof BaseEntity>(this: T, sort: { [K in keyof Partial<T['prototype']>]: ('ASC' | 'DESC') }): T {
+  public static sortBy<T extends typeof BaseEntity>(this: T, sort: PropertySorting<T>): T {
     this._sort = {};
 
     for (const [key, value] of Object.entries(sort)) {
@@ -144,7 +144,7 @@ export class BaseEntity {
       result = await this.repository.findOne(filter);
     }
 
-    return plainToClassFromExist(new this, result);
+    return plainToClassFromExist(new this, result)
   }
 
   /**
