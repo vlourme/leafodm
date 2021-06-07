@@ -93,8 +93,6 @@ await user.update()
 ```ts
 const user = await User.findOne('60bbedee3310443e74b495da')
 
-user.name = 'John Doe Jr'
-
 await user.delete()
 ```
 
