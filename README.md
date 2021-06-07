@@ -115,7 +115,7 @@ const users = await User.skip(5).find() // Will skip 5 first documents
 
 ## Usage tips
 This library is very useful when combined with [`class-transformer`](https://github.com/typestack/class-transformer/) and [`class-validator`](https://github.com/typestack/class-validator),
-no need to instance your model and write date to every fields.
+no need to instance your model and write data to every fields.
 Here is an example with the web framework [FoalTS](http://foalts.org/):
 ```ts
 @Post('/register')
