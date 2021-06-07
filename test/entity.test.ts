@@ -75,7 +75,7 @@ describe('Entity', () => {
   test('should get all object with DESC order', async () => {
     const users = await User.sortBy({
       name: 'DESC',
-    
+
     }).find()
 
     expect(users).toBeTruthy()
@@ -114,6 +114,21 @@ describe('Entity', () => {
     expect(update).toBeTruthy()
   })
 
+  test('should update one object by its id', async () => {
+    const user = await User.findOne({
+      email: 'mike@example.org'
+    })
+
+    const result = await User.update(user!._id, {
+      'name': 'Mike Jr.'
+    })
+
+    const updated = await User.findOne(result!._id)
+
+    expect(updated).toBeTruthy()
+    expect(updated?.name).toBe('Mike Jr.')
+  })
+
   test('should delete an object', async () => {
     const user = await User.findOne({
       email: 'mike@example.org'
@@ -124,12 +139,12 @@ describe('Entity', () => {
     expect(deleted).toBeTruthy()
   })
 
-  test('should delete another object', async () => {
+  test('should delete an object by its ID', async () => {
     const user = await User.findOne({
       email: 'john.doe@example.org'
     })
 
-    const deleted = await user?.delete()
+    const deleted = await User.delete(user!._id)
 
     expect(deleted).toBeTruthy()
   })

@@ -19,11 +19,16 @@ type RemoveIndex<T> = {
 export type PropertySorting<T extends typeof BaseEntity> = Partial<Record<NonFunctionKeys<RemoveIndex<T['prototype']>>, 'ASC' | 'DESC'>>
 
 /**
+ * Get properties of T without index signature and methods
+ */
+export type PropertiesOf<T extends typeof BaseEntity> = Pick<RemoveIndex<T['prototype']>, NonFunctionKeys<RemoveIndex<T['prototype']>>>
+
+/**
+ * Assign properties of T as optional and allow unknown keys to be assigned too (schema-less)
+ */
+export type Properties<T extends typeof BaseEntity> = Partial<PropertiesOf<T>> & { [key: string]: unknown }
+
+/**
  * FilterQuery
  */
 export type Filter<T extends typeof BaseEntity, K extends keyof T> = FilterQuery<T[K] | { _id?: string | ObjectID }>
-
-/**
- * Entity with any type allowed
- */
-export type Entity<T> = T & Record<string, unknown>

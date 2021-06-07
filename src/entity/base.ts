@@ -1,7 +1,7 @@
 import { classToPlain, plainToClass, plainToClassFromExist, Type } from 'class-transformer';
 import { Collection, FindOneOptions, ObjectID, WithoutProjection } from 'mongodb';
 import { DatabaseManager } from '../manager';
-import { Filter, PropertySorting } from '../types';
+import { Filter, Properties, PropertySorting } from '../types';
 
 /**
  * Base Entity
@@ -171,6 +171,23 @@ export class BaseEntity {
   }
 
   /**
+   * Update an object statically by its ID
+   *
+   * @param { string | ObjectID } id ID of the object
+   * @param { Properties<T> } data Data
+   */
+  public static async update<T extends typeof BaseEntity>(this: T, id: string | ObjectID, data: Properties<T>): Promise<T['prototype'] | undefined> {
+    // Get object
+    const instance = await this.findOne(id)
+
+    // Assign data
+    Object.assign(instance, data)
+
+    // Update
+    return await instance?.update()
+  }
+
+  /**
    * Update the object
    */
   public async update(): Promise<this> {
@@ -199,6 +216,24 @@ export class BaseEntity {
       _id: new ObjectID(this._id)
     });
 
-    return res.deletedCount == 1;
+    return res.deletedCount === 1;
+  }
+
+  /**
+   * Delete an object by its ID
+   *
+   * @param { string | ObjectID } id
+   * @returns { Promise<boolean> }
+   */
+  public static async delete<T extends typeof BaseEntity>(this: T, id: string | ObjectID): Promise<boolean> {
+    if (typeof id === 'string') {
+      id = new ObjectID(id)
+    }
+
+    const res = await this.repository.deleteOne({
+      _id: id
+    })
+
+    return res.deletedCount === 1
   }
 }
