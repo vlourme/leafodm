@@ -72,13 +72,22 @@ describe('Entity', () => {
     expect(users.length).toBe(1)
   })
 
+  test('should get all object with ASC order', async () => {
+    const users = await User.sortBy({
+      name: 'ASC',
+
+    }).find()
+
+    expect(users.length).toBe(2)
+    expect(users[0].email).toBe('john.doe@example.org')
+  })
+
   test('should get all object with DESC order', async () => {
     const users = await User.sortBy({
       name: 'DESC',
 
     }).find()
 
-    expect(users).toBeTruthy()
     expect(users.length).toBe(2)
     expect(users[0].email).toBe('mike@example.org')
   })
@@ -88,8 +97,19 @@ describe('Entity', () => {
       email: 'mike@example.org'
     })
 
-    expect(users).toBeTruthy()
     expect(users[0].name).toBe('Mike')
+  })
+
+  test('should get object with using nested ID', async () => {
+    const res = await User.findOne({
+      email: 'mike@example.org'
+    })
+
+    const user = await User.findOne({
+      _id: res!._id
+    })
+
+    expect(user?.name).toBe('Mike')
   })
 
   test('should get one object', async () => {

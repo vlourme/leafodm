@@ -192,10 +192,7 @@ export class BaseEntity {
    */
   public async update(): Promise<this> {
     const data = classToPlain(this, { ignoreDecorators: true });
-
-    if ('_id' in data) {
-      delete data._id;
-    }
+    delete data._id;
 
     await this.repository.updateOne({
       _id: new ObjectID(this._id)

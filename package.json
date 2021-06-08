@@ -4,7 +4,7 @@
   "description": "MongoDB abstraction layer in TypeScript",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
+    "test": "jest --coverage",
     "prepublish": "npm test"
   },
   "author": "Victor Lourme",
