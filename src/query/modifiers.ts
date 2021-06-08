@@ -34,7 +34,7 @@ export abstract class ModifierBuilder extends BaseModel {
    * @param { number | undefined } amount Limit of document
    * @return { this }
    */
-  public static take<T extends typeof ModifierBuilder>(this: T, amount?: number): T {
+  public static take<T extends typeof BaseEntity>(this: T, amount?: number): T {
     this._take = amount;
 
     return this;
@@ -46,7 +46,7 @@ export abstract class ModifierBuilder extends BaseModel {
    * @return { this }
    * @param amount
    */
-  public static skip<T extends typeof ModifierBuilder>(this: T, amount?: number): T {
+  public static skip<T extends typeof BaseEntity>(this: T, amount?: number): T {
     this._skip = amount;
 
     return this;
