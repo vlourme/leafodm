@@ -7,7 +7,15 @@
     "test": "jest --coverage",
     "prepublish": "npm test"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Victor Lourme",
+  "keywords": [
+    "MongoDB",
+    "TypeScript",
+    "ODM",
+    "ORM"
+  ],
   "license": "MIT",
   "dependencies": {
     "class-transformer": "^0.4.0",
