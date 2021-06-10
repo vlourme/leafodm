@@ -31,4 +31,4 @@ export type Properties<T extends typeof BaseEntity> = Partial<PropertiesOf<T>> &
 /**
  * FilterQuery
  */
-export type Filter<T extends typeof BaseEntity, K extends keyof T> = FilterQuery<T[K] | { _id?: string | ObjectID }>
+export type Filter<T extends typeof BaseEntity> = FilterQuery<PropertiesOf<T> | { _id?: string | ObjectID }>

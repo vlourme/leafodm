@@ -11,7 +11,7 @@ export abstract class ReadOperator extends CreateOperator {
    * @param { string | Filter<T, K> } filter Filter can be an ID as an string or an object as payload filter
    * @returns { T['prototype'] | undefined } Entity class or undefined if not found
    */
-  public static async findOne<T extends typeof BaseEntity, K extends keyof T>(this: T, filter: Filter<T, K> | string): Promise<T['prototype'] | undefined> {
+  public static async findOne<T extends typeof BaseEntity>(this: T, filter: Filter<T>): Promise<T['prototype'] | undefined> {
     let result: any;
 
     if (typeof filter === 'string') {
@@ -32,7 +32,7 @@ export abstract class ReadOperator extends CreateOperator {
   /**
    * Find multiple entities that match criteria
    */
-  public static async find<T extends typeof BaseEntity, K extends keyof T>(this: T, filter?: Filter<T, K>): Promise<T['prototype'][]> {
+  public static async find<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<T['prototype'][]> {
     const query = this.repository.find(filter ?? {}, this.options);
 
     const result = await query.toArray();
