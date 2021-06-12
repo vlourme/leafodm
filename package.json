@@ -4,7 +4,7 @@
   "description": "MongoDB abstraction layer in TypeScript",
   "scripts": {
     "build": "tsc",
-    "test": "jest --coverage",
+    "test": "jest --coverage --runInBand",
     "prepublish": "npm test"
   },
   "main": "dist/index.js",
