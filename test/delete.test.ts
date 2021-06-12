@@ -34,4 +34,20 @@ describe('Entity deletion', () => {
 
     expect(deleted).toBeTruthy()
   })
+
+  test('should delete many object by instance', async () => {
+    const users = await User.createMany([
+      { email: 'test1@example.org' },
+      { email: 'test2@example.org' },
+      { email: 'test3@example.org' }
+    ])
+
+    expect(users).toHaveLength(3)
+
+    const deleted = await User.deleteMany({
+      email: /^test/
+    })
+
+    expect(deleted).toBeTruthy()
+  })
 })

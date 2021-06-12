@@ -45,4 +45,29 @@ describe('Entity creation', () => {
 
     expect(created._id).toBeTruthy()
   })
+
+  test('should create many objects', async () => {
+    const users = await User.createMany([
+      {
+        email: 'test1@example.org'
+      },
+      {
+        email: 'test2@example.org'
+      },
+      {
+        email: 'test3@example.org'
+      }
+    ])
+
+    expect(users).toHaveLength(3)
+    expect(users).toContainEqual(expect.objectContaining({
+      _id: expect.anything(),
+      email: expect.anything()
+    }))
+
+    for (const user of users) {
+      const deleted = await user.delete()
+      expect(deleted).toBeTruthy()
+    }
+  })
 })

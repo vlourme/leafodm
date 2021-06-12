@@ -1,7 +1,7 @@
 import { classToPlain } from "class-transformer";
 import { ObjectID } from "mongodb";
 import { BaseEntity } from "../entity";
-import { Properties } from "../types";
+import { Filter, Properties, PropertiesOf } from "../types";
 import { ReadOperator } from "./read";
 
 export abstract class UpdateOperator extends ReadOperator {
@@ -36,5 +36,20 @@ export abstract class UpdateOperator extends ReadOperator {
     });
 
     return this;
+  }
+
+  /**
+   * Update many document following criteria
+   *
+   * @param { Filter<T> } filter Criteria
+   * @param { Properties<T> } data Update data
+   * @returns { Promise<number> } Number of affected documents
+   */
+  public static async updateMany<T extends typeof BaseEntity>(this: T, filter: Filter<T>, data: Properties<T>): Promise<number> {
+    const { modifiedCount } = await this.repository.updateMany(filter, {
+      $set: data
+    })
+
+    return modifiedCount
   }
 }

@@ -46,4 +46,28 @@ describe('Entity creation', () => {
     expect(updated).toBeTruthy()
     expect(updated?.name).toBe('Mike Jr.')
   })
+
+  test('should update many objects', async () => {
+    const users = await User.createMany([
+      { email: 'test1@example.org' },
+      { email: 'test2@example.org' },
+      { email: 'test3@example.org' }
+    ])
+
+    expect(users).toHaveLength(3)
+
+    const count = await User.updateMany({
+      email: /^test/,
+    }, {
+      name: 'John'
+    })
+
+    expect(count).toBe(3)
+
+    const deleted = await User.deleteMany({
+      email: /^test/
+    })
+
+    expect(deleted).toBeTruthy()
+  })
 })
