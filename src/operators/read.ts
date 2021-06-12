@@ -39,4 +39,14 @@ export abstract class ReadOperator extends CreateOperator {
 
     return plainToClass(this, result);
   }
+
+  /**
+   * Count number of document that matches the criteria
+   *
+   * @param { Filter<T> } filter Criteria
+   * @returns { Promise<number> } Number of document
+   */
+  public static async count<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<number> {
+    return await this.repository.count(filter)
+  }
 }

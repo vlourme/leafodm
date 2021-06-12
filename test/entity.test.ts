@@ -112,6 +112,12 @@ describe('Entity', () => {
     expect(user?.name).toBe('Mike')
   })
 
+  test('should count objects', async () => {
+    const count = await User.count()
+
+    expect(count).toBe(2)
+  })
+
   test('should get one object', async () => {
     const user = await User.findOne({
       email: 'john.doe@example.org'
