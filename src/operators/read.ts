@@ -47,6 +47,6 @@ export abstract class ReadOperator extends CreateOperator {
    * @returns { Promise<number> } Number of document
    */
   public static async count<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<number> {
-    return await this.repository.count(filter)
+    return await this.repository.countDocuments(filter)
   }
 }
