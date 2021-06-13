@@ -1,7 +1,7 @@
 import { classToPlain } from "class-transformer";
 import { ObjectID } from "mongodb";
 import { BaseEntity } from "../entity";
-import { Filter, Properties, PropertiesOf } from "../types";
+import { Filter, Properties } from "../types";
 import { ReadOperator } from "./read";
 
 export abstract class UpdateOperator extends ReadOperator {

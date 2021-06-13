@@ -24,10 +24,6 @@ export abstract class DeleteOperator extends UpdateOperator {
    * @returns { Promise<boolean> }
    */
   public static async delete<T extends typeof BaseEntity>(this: T, id: string | ObjectID): Promise<boolean> {
-    if (typeof id === 'string') {
-      id = new ObjectID(id)
-    }
-
     const { deletedCount } = await this.repository.deleteOne({
       _id: id
     })
@@ -44,6 +40,6 @@ export abstract class DeleteOperator extends UpdateOperator {
   public static async deleteMany<T extends typeof BaseEntity>(this: T, filter: Filter<T>): Promise<boolean> {
     const { deletedCount } = await this.repository.deleteMany(filter)
 
-    return (deletedCount || 0) > 0
+    return deletedCount !== 0
   }
 }
