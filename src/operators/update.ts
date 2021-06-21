@@ -8,6 +8,8 @@ export abstract class UpdateOperator extends ReadOperator {
   /**
    * Update an object statically by its ID
    *
+   * Note: This method may have problems with relations
+   *
    * @param { string | ObjectID } id ID of the object
    * @param { Properties<T> } data Data
    */
@@ -24,15 +26,24 @@ export abstract class UpdateOperator extends ReadOperator {
 
   /**
    * Update the object
+   *
+   * @param { boolean } upsert Insert object if it does not exists
+   * @param { boolean } nested When true, relation will be nested in main entity
    */
-  public async update(): Promise<this> {
-    const data = classToPlain(this, { ignoreDecorators: true });
+  public async update(upsert = false, nested = false): Promise<this> {
+    let data = classToPlain(this, { ignoreDecorators: true });
     delete data._id;
+
+    if (!nested) {
+      data = await this.handleRelation(data, async (entity) => await entity.update(true, false))
+    }
 
     await this.constructor.repository.updateOne({
       _id: new ObjectID(this._id)
     }, {
       $set: data
+    }, {
+      upsert
     });
 
     return this;

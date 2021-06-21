@@ -8,12 +8,13 @@ export abstract class ReadOperator extends CreateOperator {
    * Find one object that match the selected criteria
    *
    * @param { string | Filter<T, K> } filter Filter can be an ID as an string or an object as payload filter
+   * @param { boolean } relations Enable relations
    * @returns { T['prototype'] | undefined } Entity class or undefined if not found
    */
-  public static async findOne<T extends typeof BaseEntity>(this: T, filter: Filter<T> | string): Promise<T['prototype'] | undefined> {
+  public static async findOne<T extends typeof BaseEntity>(this: T, filter: Filter<T> | string, relations = true): Promise<T['prototype'] | undefined> {
     const payload = this.transformFilters(filter)
 
-    if (this.relations.length > 0) {
+    if (relations && this.relations.length > 0) {
       const result = await this.lookup(payload)
 
       return result ? result[0] : undefined
@@ -45,7 +46,13 @@ export abstract class ReadOperator extends CreateOperator {
     return await this.repository.countDocuments(filter)
   }
 
-  public static async lookup<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<T['prototype'][] | undefined> {
+  /**
+   * Execute a lookup aggregation to fetch relations
+   *
+   * @param { Filter<T> } filter
+   * @returns { Promise<T['prototype'][] | undefined> }
+   */
+  protected static async lookup<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<T['prototype'][] | undefined> {
     const lookups: Record<string, any>[] = []
 
     for (const relation of this.relations) {

@@ -12,21 +12,10 @@ export abstract class CreateOperator extends ModifierBuilder {
    * @return { this }
    */
   public async create(nested = false): Promise<this> {
-    const data = classToPlain(this, { ignoreDecorators: true });
+    let data = classToPlain(this, { ignoreDecorators: true });
 
-    for (const relation of this.constructor.relations) {
-      if (!nested && relation.property in this && this[relation.property] instanceof BaseEntity) {
-        const entity = await (<BaseEntity>this[relation.property]).create()
-
-        // Set relation ID on MongoDB payload
-        data[relation.localKey] = entity._id
-
-        // Set entity on instance
-        this[relation.property] = entity
-
-        // Prevent saving sub-document
-        delete data[relation.property]
-      }
+    if (!nested) {
+      data = await this.handleRelation(data, async (entity) => await entity.create())
     }
 
     const { insertedId } = await this.constructor.repository.insertOne(data);
@@ -45,5 +34,30 @@ export abstract class CreateOperator extends ModifierBuilder {
     await this.repository.insertMany(data)
 
     return data.map(v => plainToClass(this, v))
+  }
+
+  /**
+   * Handle relation transforming with a callback to execute nested entity action
+   *
+   * @param { Record<string, any> } data
+   * @param { (entity: BaseEntity) => Promise<BaseEntity> } callback Callback to create or update model
+   */
+  protected async handleRelation(data: Record<string, any>, callback: (entity: BaseEntity) => Promise<BaseEntity>): Promise<Record<string, any>> {
+    for (const relation of this.constructor.relations) {
+      if (relation.property in this && this[relation.property] instanceof BaseEntity) {
+        const entity = await callback(<BaseEntity>this[relation.property])
+
+        // Set relation ID on MongoDB payload
+        data[relation.localKey] = entity._id
+
+        // Set entity on instance
+        this[relation.property] = entity
+
+        // Prevent saving sub-document
+        delete data[relation.property]
+      }
+    }
+
+    return data
   }
 }

@@ -32,8 +32,12 @@ describe('Entity reading', () => {
 
     await post.create()
 
-    expect(post._id).toBeTruthy()
-    expect(post.author._id).toBeTruthy()
+    const find = await Post.findOne({ title: 'New post' })
+
+    expect(find?._id).toBeTruthy()
+    expect(find?.title).toBe('New post')
+    expect(find?.author?._id).toBeTruthy()
+    expect(find?.author?.name).toBe('David')
   })
 
   test('Create entity with nested relation', async () => {
@@ -43,9 +47,11 @@ describe('Entity reading', () => {
 
     await post.create(true)
 
-    expect(post._id).toBeTruthy()
-    expect(post.author).not.toHaveProperty('_id')
-    expect(post.author?.name).toBe('John')
+    const find = await Post.findOne({ title: 'Another' }, false)
+
+    expect(find?._id).toBeTruthy()
+    expect(find?.author).not.toHaveProperty('_id')
+    expect(find?.author?.name).toBe('John')
   })
 
   test('Find linked objects', async () => {
@@ -53,5 +59,36 @@ describe('Entity reading', () => {
 
     expect(post?.title).toBe("New post")
     expect(post?.author?.name).toBe('David')
+  })
+
+  test('Find linked objects nested', async () => {
+    const post = await Post.findOne({ title: 'Another' }, false)
+
+    expect(post?.title).toBe("Another")
+    expect(post?.author?.name).toBe('John')
+    expect(post?.author).not.toHaveProperty('_id')
+  })
+
+  test('Update linked object', async () => {
+    const post = await Post.findOne({ title: 'New post' })
+
+    post!.author!.name = 'Mike'
+
+    await post?.update()
+
+    const find = await Post.findOne({ title: 'New post' })
+    expect(find?.author?.name).toBe('Mike')
+  })
+
+  test('Update with nested relation', async () => {
+    const post = await Post.findOne({ title: 'Another' }, false)
+
+    post!.author!.name = 'Dave'
+
+    await post?.update(false, true)
+
+    const find = await Post.findOne({ title: 'Another' }, false)
+    expect(find?.author).not.toHaveProperty('_id')
+    expect(find?.author?.name).toBe('Dave')
   })
 })
