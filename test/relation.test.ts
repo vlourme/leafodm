@@ -25,11 +25,33 @@ afterAll(async () => {
 })
 
 describe('Entity reading', () => {
+  test('Create entity with sub-entity as relation', async () => {
+    const post = new Post()
+    post.title = 'New post'
+    post.author = new Author({ name: 'David' })
+
+    await post.create()
+
+    expect(post._id).toBeTruthy()
+    expect(post.author._id).toBeTruthy()
+  })
+
+  test('Create entity with nested relation', async () => {
+    const post = new Post()
+    post.title = 'Another'
+    post.author = new Author({ name: 'John' })
+
+    await post.create(true)
+
+    expect(post._id).toBeTruthy()
+    expect(post.author).not.toHaveProperty('_id')
+    expect(post.author?.name).toBe('John')
+  })
+
   test('Find linked objects', async () => {
-    const post = await Post.findOne("60cf00485deec81274d9314c")
+    const post = await Post.findOne({ title: 'New post' })
 
-    expect(post?.title).toBe("Another post")
-
-    expect(post?.author?.name).toBe('John Doe')
+    expect(post?.title).toBe("New post")
+    expect(post?.author?.name).toBe('David')
   })
 })

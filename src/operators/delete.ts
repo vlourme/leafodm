@@ -10,11 +10,7 @@ export abstract class DeleteOperator extends UpdateOperator {
    * @return { boolean }
    */
   public async delete(): Promise<boolean> {
-    const { deletedCount } = await this.repository.deleteOne({
-      _id: new ObjectID(this._id)
-    });
-
-    return deletedCount === 1;
+    return this.constructor.delete(this._id)
   }
 
   /**
@@ -24,9 +20,7 @@ export abstract class DeleteOperator extends UpdateOperator {
    * @returns { Promise<boolean> }
    */
   public static async delete<T extends typeof BaseEntity>(this: T, id: string | ObjectID): Promise<boolean> {
-    const { deletedCount } = await this.repository.deleteOne({
-      _id: id
-    })
+    const { deletedCount } = await this.repository.deleteOne(this.transformFilters(id))
 
     return deletedCount === 1
   }
@@ -38,7 +32,7 @@ export abstract class DeleteOperator extends UpdateOperator {
    * @returns { Promise<boolean> }
    */
   public static async deleteMany<T extends typeof BaseEntity>(this: T, filter: Filter<T>): Promise<boolean> {
-    const { deletedCount } = await this.repository.deleteMany(filter)
+    const { deletedCount } = await this.repository.deleteMany(this.transformFilters(filter))
 
     return deletedCount !== 0
   }

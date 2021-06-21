@@ -54,17 +54,6 @@ export abstract class BaseModel {
   }
 
   /**
-   * Get repository from instance name
-   *
-   * @instance
-   */
-  protected get repository(): Collection<any> {
-    const collection = this.constructor.getDatabaseName()
-
-    return DatabaseManager.client.db().collection(collection);
-  }
-
-  /**
    * Clean and sanitize filters inputs
    *
    * @param { Filter<T> | ObjectID | string } filter Criteria

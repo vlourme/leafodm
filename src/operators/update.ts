@@ -29,7 +29,7 @@ export abstract class UpdateOperator extends ReadOperator {
     const data = classToPlain(this, { ignoreDecorators: true });
     delete data._id;
 
-    await this.repository.updateOne({
+    await this.constructor.repository.updateOne({
       _id: new ObjectID(this._id)
     }, {
       $set: data
