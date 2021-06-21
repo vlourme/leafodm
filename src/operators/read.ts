@@ -1,5 +1,4 @@
 import { plainToClass, plainToClassFromExist } from "class-transformer";
-import { ObjectID } from "mongodb";
 import { BaseEntity } from "../entity";
 import { Filter } from "../types";
 import { CreateOperator } from "./create";
@@ -12,21 +11,17 @@ export abstract class ReadOperator extends CreateOperator {
    * @returns { T['prototype'] | undefined } Entity class or undefined if not found
    */
   public static async findOne<T extends typeof BaseEntity>(this: T, filter: Filter<T> | string): Promise<T['prototype'] | undefined> {
-    let result: any;
+    const payload = this.transformFilters(filter)
 
-    if (typeof filter === 'string') {
-      result = await this.repository.findOne({
-        _id: new ObjectID(filter)
-      });
+    if (this.relations.length > 0) {
+      const result = await this.lookup(payload)
+
+      return result ? result[0] : undefined
     } else {
-      if ('_id' in filter && typeof filter._id === 'string') {
-        filter._id = new ObjectID(filter._id);
-      }
+      const result = await this.repository.findOne(payload)
 
-      result = await this.repository.findOne(filter);
+      return plainToClassFromExist(new this, result)
     }
-
-    return plainToClassFromExist(new this, result)
   }
 
   /**
@@ -48,5 +43,53 @@ export abstract class ReadOperator extends CreateOperator {
    */
   public static async count<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<number> {
     return await this.repository.countDocuments(filter)
+  }
+
+  public static async lookup<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<T['prototype'][] | undefined> {
+    const lookups: Record<string, any>[] = []
+
+    for (const relation of this.relations) {
+      if (relation.isObjectId) {
+        lookups.push({
+          $set: {
+            [relation.localKey]: {
+              $toObjectId: '$' + relation.localKey
+            }
+          }
+        })
+      }
+
+      lookups.push({
+        $lookup: {
+          from: relation.fieldName,
+          localField: relation.localKey,
+          foreignField: relation.foreignKey,
+          as: relation.fieldName
+        }
+      })
+    }
+
+    const aggregation = this.repository.aggregate([
+      {
+        $match: filter
+      },
+      ...lookups
+    ])
+
+    const result = await aggregation.toArray()
+
+    for (let i = 0; i < result.length; i++) {
+      const object = result[i]
+
+      for (const relation of this.relations) {
+        if (relation.relation === 'one' && relation.fieldName in object && Array.isArray(object[relation.fieldName])) {
+          object[relation.fieldName] = plainToClass(relation.type, object[relation.fieldName][0])
+        }
+      }
+
+      result[i] = plainToClassFromExist(new this, object)
+    }
+
+    return result
   }
 }

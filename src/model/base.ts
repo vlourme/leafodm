@@ -1,6 +1,8 @@
 import { Type } from "class-transformer";
-import { Collection } from "mongodb";
-import { DatabaseManager } from "..";
+import { Collection, ObjectID } from "mongodb";
+import { DatabaseManager, Filter } from "..";
+import { BaseEntity } from "../entity";
+import { IRelation } from "../interfaces/relation";
 
 export abstract class BaseModel {
   /**
@@ -15,6 +17,16 @@ export abstract class BaseModel {
   [key: string]: unknown
 
   /**
+   * Constructor definition for self accessing
+   */
+  ['constructor']: typeof BaseEntity
+
+  /**
+   * Relations
+   */
+  public static relations: IRelation[] = []
+
+  /**
    * Initialize a new model
    *
    * @param { object } data Set existing data
@@ -24,14 +36,21 @@ export abstract class BaseModel {
   }
 
   /**
+   * Get database name from function or transform another function name to database
+   * @param { string } name Function Name
+   * @returns { string }
+   */
+  public static getDatabaseName(name: string = this.name): string {
+    return name.toLowerCase()
+  }
+
+  /**
    * Get repository from collection
    *
    * @static
    */
   protected static get repository(): Collection<any> {
-    const collection = this.name.toLowerCase();
-
-    return DatabaseManager.client.db().collection(collection);
+    return DatabaseManager.client.db().collection(this.getDatabaseName());
   }
 
   /**
@@ -40,8 +59,32 @@ export abstract class BaseModel {
    * @instance
    */
   protected get repository(): Collection<any> {
-    const collection = this.constructor.name.toLowerCase();
+    const collection = this.constructor.getDatabaseName()
 
     return DatabaseManager.client.db().collection(collection);
+  }
+
+  /**
+   * Clean and sanitize filters inputs
+   *
+   * @param { Filter<T> | ObjectID | string } filter Criteria
+   * @returns { Filter<T> }
+   */
+  protected static transformFilters<T extends typeof BaseEntity>(filter: Filter<T> | string | ObjectID): Filter<T> {
+    let ret: Filter<T>
+
+    if (typeof filter == 'string' || filter instanceof ObjectID) {
+      ret = {
+        _id: filter
+      }
+    } else {
+      ret = filter
+    }
+
+    if ('_id' in ret && typeof ret._id === 'string') {
+      ret._id = new ObjectID(ret._id)
+    }
+
+    return ret
   }
 }

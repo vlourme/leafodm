@@ -1,6 +1,5 @@
 import { classToPlain, plainToClass, plainToClassFromExist } from "class-transformer";
 import { BaseEntity } from "../entity";
-import { BaseModel } from "../model";
 import { ModifierBuilder } from "../query";
 import { Properties } from "../types";
 
