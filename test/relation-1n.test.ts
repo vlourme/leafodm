@@ -72,6 +72,20 @@ describe('Relation: One to Many 1:n', () => {
     expect(post).toBeUndefined()
   })
 
+  test('Find all objects', async () => {
+    const posts = await Post.find()
+
+    expect(posts[0].author?.name).toBe('David')
+    expect(posts[1].author).toBeUndefined()
+  })
+
+  test('Find all objects without relation', async () => {
+    const posts = await Post.find({}, false)
+
+    expect(posts[0]).not.toContain('author')
+    expect(posts[1]).not.toContain('author')
+  })
+
   test('Update linked object', async () => {
     const post = await Post.findOne({ title: 'New post' })
 

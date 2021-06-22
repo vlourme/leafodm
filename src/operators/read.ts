@@ -27,11 +27,23 @@ export abstract class ReadOperator extends CreateOperator {
 
   /**
    * Find multiple entities that match criteria
+   *
+   * Note: Modifiers will not work with relations (sortBy, take, skip)
+   *
+   * @param { Filter<T> } filter Criteria
+   * @param { boolean } relation Load relations
+   * @returns { Promise<T['prototype'][]> }
    */
-  public static async find<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<T['prototype'][]> {
-    const query = this.repository.find(filter ?? {}, this.options);
+  public static async find<T extends typeof BaseEntity>(this: T, filter: Filter<T> = {}, relation = true): Promise<T['prototype'][]> {
+    let result: any
 
-    const result = await query.toArray();
+    if (relation && this.relations.length > 0) {
+      result = await this.lookup(filter)
+    } else {
+      const query = this.repository.find(filter, this.options);
+
+      result = await query.toArray();
+    }
 
     return plainToClass(this, result);
   }
@@ -89,6 +101,8 @@ export abstract class ReadOperator extends CreateOperator {
       const object = result[i]
 
       for (const relation of this.relations) {
+        delete object[relation.localKey]
+
         if (relation.relation === 'one' && relation.fieldName in object && Array.isArray(object[relation.fieldName])) {
           object[relation.fieldName] = plainToClass(relation.type, object[relation.fieldName][0])
         }
