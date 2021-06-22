@@ -21,10 +21,10 @@
   },
   "include": [
     "src/**/*.ts",
+    "test/**/*.ts"
   ],
   "exclude": [
     "dist",
-    "test",
     "node_modules"
   ]
 }
