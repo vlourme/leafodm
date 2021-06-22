@@ -72,9 +72,7 @@ export abstract class CreateOperator extends ModifierBuilder {
    */
   protected disableRelation(data: Record<string, any>): Record<string, any> {
     for (const relation of this.constructor.relations) {
-      if (relation.property in data) {
-        delete data[relation.property]
-      }
+      delete data[relation.property]
     }
 
     return data

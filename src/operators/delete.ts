@@ -13,9 +13,7 @@ export abstract class DeleteOperator extends UpdateOperator {
   public async delete(relation = false): Promise<boolean> {
     if (relation) {
       for (const relation of this.constructor.relations) {
-        if (relation.property in this && this[relation.property] instanceof BaseEntity) {
-          await (<BaseEntity>this[relation.property]).delete()
-        }
+        await (<BaseEntity>this[relation.property]).delete()
       }
     }
 

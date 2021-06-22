@@ -1,6 +1,5 @@
 import { classToPlain } from "class-transformer";
 import { ObjectID } from "mongodb";
-import { Relation } from "../decorators";
 import { BaseEntity } from "../entity";
 import { Filter, Properties } from "../types";
 import { ReadOperator } from "./read";
