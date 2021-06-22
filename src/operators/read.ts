@@ -52,7 +52,7 @@ export abstract class ReadOperator extends CreateOperator {
    * @param { Filter<T> } filter
    * @returns { Promise<T['prototype'][] | undefined> }
    */
-  protected static async lookup<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<T['prototype'][] | undefined> {
+  protected static async lookup<T extends typeof BaseEntity>(this: T, filter?: Filter<T>): Promise<T['prototype'][]> {
     const lookups: Record<string, any>[] = []
 
     for (const relation of this.relations) {
@@ -93,10 +93,8 @@ export abstract class ReadOperator extends CreateOperator {
           object[relation.fieldName] = plainToClass(relation.type, object[relation.fieldName][0])
         }
       }
-
-      result[i] = plainToClassFromExist(new this, object)
     }
 
-    return result
+    return plainToClass(this, result)
   }
 }

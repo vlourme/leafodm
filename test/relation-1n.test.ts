@@ -24,7 +24,7 @@ afterAll(async () => {
   await DatabaseManager.close()
 })
 
-describe('Entity reading', () => {
+describe('Relation: One to Many 1:n', () => {
   test('Create entity with sub-entity as relation', async () => {
     const post = new Post()
     post.title = 'New post'
