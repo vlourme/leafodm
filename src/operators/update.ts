@@ -17,11 +17,16 @@ export abstract class UpdateOperator extends ReadOperator {
     // Get object
     const instance = await this.findOne(id)
 
+    // Check response
+    if (!instance) {
+      return undefined
+    }
+
     // Assign data
     Object.assign(instance, data)
 
     // Update
-    return await instance?.update()
+    return await instance.update()
   }
 
   /**

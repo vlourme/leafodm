@@ -1,3 +1,4 @@
+import { ObjectId, ObjectID } from 'bson'
 import 'reflect-metadata'
 import { DatabaseManager } from "../src"
 import { User } from "./model"
@@ -69,5 +70,13 @@ describe('Entity creation', () => {
     })
 
     expect(deleted).toBeTruthy()
+  })
+
+  test('should update undefined object', async () => {
+    const user = await User.update('11d11cb1bf11cb1fe111c111', {
+      name: 'David'
+    })
+
+    expect(user).toBeUndefined()
   })
 })
