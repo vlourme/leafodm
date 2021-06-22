@@ -40,18 +40,16 @@ describe('Entity reading', () => {
     expect(find?.author?.name).toBe('David')
   })
 
-  test('Create entity with nested relation', async () => {
+  test('Create entity with disabled relation', async () => {
     const post = new Post()
     post.title = 'Another'
-    post.author = new Author({ name: 'John' })
+    post.author = new Author({ name: 'Michael' })
 
-    await post.create(true)
+    await post.create(false)
 
-    const find = await Post.findOne({ title: 'Another' }, false)
+    const find = await Author.findOne({ name: 'Michael' })
 
-    expect(find?._id).toBeTruthy()
-    expect(find?.author).not.toHaveProperty('_id')
-    expect(find?.author?.name).toBe('John')
+    expect(find).toBeUndefined()
   })
 
   test('Find linked objects', async () => {
@@ -61,18 +59,17 @@ describe('Entity reading', () => {
     expect(post?.author?.name).toBe('David')
   })
 
+  test('Find without relation', async () => {
+    const post = await Post.findOne({ title: 'New post' }, false)
+
+    expect(post?.title).toBe("New post")
+    expect(post?.author).toBeUndefined()
+  })
+
   test('Find undefined object', async () => {
     const post = await Post.findOne({ title: 'This does not exist' })
 
     expect(post).toBeUndefined()
-  })
-
-  test('Find linked objects nested', async () => {
-    const post = await Post.findOne({ title: 'Another' }, false)
-
-    expect(post?.title).toBe("Another")
-    expect(post?.author?.name).toBe('John')
-    expect(post?.author).not.toHaveProperty('_id')
   })
 
   test('Update linked object', async () => {
@@ -86,15 +83,21 @@ describe('Entity reading', () => {
     expect(find?.author?.name).toBe('Mike')
   })
 
-  test('Update with nested relation', async () => {
-    const post = await Post.findOne({ title: 'Another' }, false)
+  test('Update linked object without relation', async () => {
+    const post = await Post.findOne({ title: 'New post' })
 
     post!.author!.name = 'Dave'
 
-    await post?.update(false, true)
+    await post?.update(false)
 
-    const find = await Post.findOne({ title: 'Another' }, false)
-    expect(find?.author).not.toHaveProperty('_id')
-    expect(find?.author?.name).toBe('Dave')
+    const bad = await Author.findOne({ name: 'Dave' })
+    expect(bad).toBeUndefined()
+
+    const valid = await Author.findOne({ name: 'Mike' })
+    expect(valid?.name).toBe('Mike')
   })
+
+  // test('Delete with relations', async () => {
+  //   const post = await Post.findOne({ title: 'New post' })
+  // })
 })

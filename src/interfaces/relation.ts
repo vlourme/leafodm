@@ -5,7 +5,7 @@ export interface IRelation {
   foreignKey: string,
   relation: 'one' | 'many',
   type: { new(): typeof BaseEntity },
-  property: string,
+  property: keyof BaseEntity,
   isObjectId: boolean
   fieldName: string
 }

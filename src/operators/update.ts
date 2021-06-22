@@ -1,5 +1,6 @@
 import { classToPlain } from "class-transformer";
 import { ObjectID } from "mongodb";
+import { Relation } from "../decorators";
 import { BaseEntity } from "../entity";
 import { Filter, Properties } from "../types";
 import { ReadOperator } from "./read";
@@ -32,15 +33,17 @@ export abstract class UpdateOperator extends ReadOperator {
   /**
    * Update the object
    *
+   * @param { boolean } relation Update linked relations
    * @param { boolean } upsert Insert object if it does not exists
-   * @param { boolean } nested When true, relation will be nested in main entity
    */
-  public async update(upsert = false, nested = false): Promise<this> {
+  public async update(relation = true, upsert = true): Promise<this> {
     let data = classToPlain(this, { ignoreDecorators: true });
     delete data._id;
 
-    if (!nested) {
-      data = await this.handleRelation(data, async (entity) => await entity.update(true, false))
+    if (relation) {
+      data = await this.handleRelation(data, async (entity) => await entity.update(true, upsert))
+    } else {
+      data = this.disableRelation(data)
     }
 
     await this.constructor.repository.updateOne({

@@ -8,14 +8,16 @@ export abstract class CreateOperator extends ModifierBuilder {
   /**
    * Save object and return object with generated ID
    *
-   * @param { boolean } nested When true, relation will be nested in main entity
+   * @param { boolean } relation Enable creating relation
    * @return { this }
    */
-  public async create(nested = false): Promise<this> {
+  public async create(relation = true): Promise<this> {
     let data = classToPlain(this, { ignoreDecorators: true });
 
-    if (!nested) {
+    if (relation) {
       data = await this.handleRelation(data, async (entity) => await entity.create())
+    } else {
+      data = this.disableRelation(data)
     }
 
     const { insertedId } = await this.constructor.repository.insertOne(data);
@@ -41,6 +43,7 @@ export abstract class CreateOperator extends ModifierBuilder {
    *
    * @param { Record<string, any> } data
    * @param { (entity: BaseEntity) => Promise<BaseEntity> } callback Callback to create or update model
+   * @returns { Promise<Record<string, any>> }
    */
   protected async handleRelation(data: Record<string, any>, callback: (entity: BaseEntity) => Promise<BaseEntity>): Promise<Record<string, any>> {
     for (const relation of this.constructor.relations) {
@@ -54,6 +57,22 @@ export abstract class CreateOperator extends ModifierBuilder {
         this[relation.property] = entity
 
         // Prevent saving sub-document
+        delete data[relation.property]
+      }
+    }
+
+    return data
+  }
+
+  /**
+   * Disable relation and delete nested attributes
+   *
+   * @param { Record<string, any> } data JSON Data
+   * @returns { Record<string, any> }
+   */
+  protected disableRelation(data: Record<string, any>): Record<string, any> {
+    for (const relation of this.constructor.relations) {
+      if (relation.property in data) {
         delete data[relation.property]
       }
     }
