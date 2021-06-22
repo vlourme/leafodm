@@ -61,6 +61,12 @@ describe('Entity reading', () => {
     expect(post?.author?.name).toBe('David')
   })
 
+  test('Find undefined object', async () => {
+    const post = await Post.findOne({ title: 'This does not exist' })
+
+    expect(post).toBeUndefined()
+  })
+
   test('Find linked objects nested', async () => {
     const post = await Post.findOne({ title: 'Another' }, false)
 

@@ -17,7 +17,7 @@ export abstract class ReadOperator extends CreateOperator {
     if (relations && this.relations.length > 0) {
       const result = await this.lookup(payload)
 
-      return result ? result[0] : undefined
+      return Array.isArray(result) && result.length > 0 ? result[0] : undefined
     } else {
       const result = await this.repository.findOne(payload)
 
