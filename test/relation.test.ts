@@ -97,7 +97,32 @@ describe('Entity reading', () => {
     expect(valid?.name).toBe('Mike')
   })
 
-  // test('Delete with relations', async () => {
-  //   const post = await Post.findOne({ title: 'New post' })
-  // })
+  test('Delete with relations', async () => {
+    const post = await Post.findOne({ title: 'New post' })
+
+    expect(post).toBeTruthy()
+
+    const deleted = await post?.delete(true)
+
+    expect(deleted).toBeTruthy()
+
+    const find = await Post.findOne({ title: 'New post' })
+
+    expect(find).toBeUndefined()
+
+    const find2 = await Author.findOne({ name: 'Mike' })
+
+    expect(find2).toBeUndefined()
+  })
+
+  test('Delete without relation', async () => {
+    const post = await Post.findOne({ title: 'Another' })
+
+    const deleted = await post?.delete(false)
+    expect(deleted).toBeTruthy()
+
+    const find = await Post.findOne({ title: 'Another' })
+
+    expect(find).toBeUndefined()
+  })
 })

@@ -7,14 +7,25 @@ export abstract class DeleteOperator extends UpdateOperator {
   /**
    * Delete an object
    *
+   * @param { boolean } relation Delete linked relations (default to false)
    * @return { boolean }
    */
-  public async delete(): Promise<boolean> {
+  public async delete(relation = false): Promise<boolean> {
+    if (relation) {
+      for (const relation of this.constructor.relations) {
+        if (relation.property in this && this[relation.property] instanceof BaseEntity) {
+          await (<BaseEntity>this[relation.property]).delete()
+        }
+      }
+    }
+
     return this.constructor.delete(this._id)
   }
 
   /**
    * Delete an object by its ID
+   *
+   * Note: this may not work with relations
    *
    * @param { string | ObjectID } id
    * @returns { Promise<boolean> }
